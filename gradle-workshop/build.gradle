@@ -1,11 +1,11 @@
 println '1: begin'
 task hello << {
-  println 'Hello, world!'
+  println '4: Hello, world!'
 }
 task date(dependsOn: hello) {
   println '2: Date configuration'
   doFirst {
-    println "4: ${new Date()}"
+    println "5: ${new Date()}"
   }
 }
 println '3: end'
