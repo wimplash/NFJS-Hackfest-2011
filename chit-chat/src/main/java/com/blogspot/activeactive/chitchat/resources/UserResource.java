@@ -1,48 +1,33 @@
 package com.blogspot.activeactive.chitchat.resources;
 
-import static java.util.Collections.synchronizedList;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.MediaType.APPLICATION_XML;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
-import com.blogspot.activeactive.chitchat.domain.Name;
+import com.blogspot.activeactive.chitchat.dao.impl.UserDao;
 import com.blogspot.activeactive.chitchat.domain.User;
-import com.sun.jersey.spi.resource.Singleton;
 
-@Singleton
 @Path("/user")
 public class UserResource {
 
-	private static final List<User> users = synchronizedList(new ArrayList<User>());
-	static {
-		users.add(createUser(1, "Ryan", "Ransford"));
-		users.add(createUser(2, "Gee-paw", "Hill"));
-	}
+	private static final UserDao userDao = new UserDao();
 
-	private static User createUser(final int id, final String firstName,
-			final String lastName) {
-		final User u = new User();
-		u.setId(id);
-		u.setName(createName(firstName, lastName));
-		return u;
-	}
-
-	private static Name createName(final String first, final String last) {
-		final Name n = new Name();
-		n.setFirst(first);
-		n.setLast(last);
-		return n;
+	@GET
+	@Path("/id/{id}")
+	@Produces({APPLICATION_XML, APPLICATION_JSON})
+	public User getUser(@PathParam("id") final Integer id) {
+		return userDao.get(id);
 	}
 
 	@GET
 	@Produces({APPLICATION_XML, APPLICATION_JSON})
 	public List<User> getAllUsers() {
-		return users;
+		return userDao.getAll();
 	}
 }
