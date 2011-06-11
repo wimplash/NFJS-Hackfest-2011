@@ -26,6 +26,12 @@ public class ITUserResource {
 	}
 
 	@Test
+	public void userResourceShouldReturnJsonUserForUserUrlWithNick() throws Exception {
+		final JSONObject user = helper.getPayloadFromJson("/user/nick/wimplash");
+		assertEquals(1, user.getInt("id"));
+	}
+
+	@Test
 	public void userResourceShouldReturnXmlListForBaseUserUrl() throws Exception {
 		final Users u = helper.getPayloadFromXml("/user", Users.class);
 		assertEquals(2, u.getUser().size());
@@ -34,6 +40,12 @@ public class ITUserResource {
 	@Test
 	public void userResourceShouldReturnXmlUserForUserUrlWithId() throws Exception {
 		final User u = helper.getPayloadFromXml("/user/id/1", User.class);
+		assertEquals(new Integer(1), u.getId());
+	}
+
+	@Test
+	public void userResourceShouldReturnXmlUserForUserUrlWithNick() throws Exception {
+		final User u = helper.getPayloadFromXml("/user/nick/wimplash", User.class);
 		assertEquals(new Integer(1), u.getId());
 	}
 }

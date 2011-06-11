@@ -22,7 +22,14 @@ public class UserResource {
 	@Path("/id/{id}")
 	@Produces({APPLICATION_XML, APPLICATION_JSON})
 	public User getUser(@PathParam("id") final Integer id) {
-		return userDao.get(id);
+		return userDao.getById(id);
+	}
+
+	@GET
+	@Path("/nick/{nick}")
+	@Produces({APPLICATION_XML, APPLICATION_JSON})
+	public User getUser(@PathParam("nick") final String nick) {
+		return userDao.getByNick(nick);
 	}
 
 	@GET

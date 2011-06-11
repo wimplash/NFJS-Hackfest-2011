@@ -12,13 +12,19 @@ public class User {
 
 	private Name name;
 
-	@XmlAttribute(required=true)
+	private String nick;
+
+	@XmlAttribute(required = true)
 	public Integer getId() {
 		return id;
 	}
 
 	public Name getName() {
 		return name;
+	}
+
+	public String getNick() {
+		return nick;
 	}
 
 	public void setId(final Integer id) {
@@ -29,8 +35,12 @@ public class User {
 		this.name = name;
 	}
 
+	public void setNick(final String nick) {
+		this.nick = nick;
+	}
+
 	@Override
 	public String toString() {
-		return String.format("%1d: %2s", getId(), getName());
+		return String.format("%1d: %2s (%3s)", getId(), getName(), getNick());
 	}
 }
