@@ -7,6 +7,7 @@ import org.json.JSONObject;
 import org.junit.Test;
 
 import com.blogspot.activeactive.chitchat.domain.User;
+import com.blogspot.activeactive.chitchat.domain.Users;
 
 public class ITUserResource {
 

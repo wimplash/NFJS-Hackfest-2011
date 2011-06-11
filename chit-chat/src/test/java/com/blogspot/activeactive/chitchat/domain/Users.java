@@ -1,4 +1,4 @@
-package com.blogspot.activeactive.chitchat.resources;
+package com.blogspot.activeactive.chitchat.domain;
 
 import java.util.List;
 
