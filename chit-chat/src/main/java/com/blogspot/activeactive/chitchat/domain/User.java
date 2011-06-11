@@ -1,29 +1,36 @@
 package com.blogspot.activeactive.chitchat.domain;
 
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
+
+@XmlRootElement
+@XmlType
 public class User {
 
-	public final int id;
-	public final String firstName;
-	public final String lastName;
+	private Integer id;
 
-	public User(final int id, final String firstName, final String lastName) {
+	private Name name;
+
+	@XmlAttribute(required=true)
+	public Integer getId() {
+		return id;
+	}
+
+	public Name getName() {
+		return name;
+	}
+
+	public void setId(final Integer id) {
 		this.id = id;
-		this.firstName = firstName;
-		this.lastName = lastName;
+	}
+
+	public void setName(final Name name) {
+		this.name = name;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("%1d: %2s %3s", id, firstName, lastName);
-	}
-
-	public String toXml() {
-		final StringBuffer buf = new StringBuffer();
-		buf.append("<user id=\"").append(id).append("\">");
-		buf.append("<name>");
-		buf.append("<first>").append(firstName).append("</first>");
-		buf.append("<last>").append(lastName).append("</last>");
-		buf.append("</user>");
-		return buf.toString();
+		return String.format("%1d: %2s", getId(), getName());
 	}
 }
