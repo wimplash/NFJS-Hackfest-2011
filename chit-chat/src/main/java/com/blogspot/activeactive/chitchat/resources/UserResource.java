@@ -3,7 +3,6 @@ package com.blogspot.activeactive.chitchat.resources;
 import static java.util.Collections.synchronizedList;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.MediaType.APPLICATION_XML;
-import static javax.ws.rs.core.MediaType.TEXT_HTML;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +10,6 @@ import java.util.List;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
 
 import com.blogspot.activeactive.chitchat.domain.Name;
 import com.blogspot.activeactive.chitchat.domain.User;
@@ -43,14 +41,8 @@ public class UserResource {
 	}
 
 	@GET
-	@Produces(APPLICATION_XML)
-	public List<User> getAllUsers_Xml() {
-		return users;
-	}
-
-	@GET
-	@Produces(APPLICATION_JSON)
-	public List<User> getAllUsers_Json() {
+	@Produces({APPLICATION_XML, APPLICATION_JSON})
+	public List<User> getAllUsers() {
 		return users;
 	}
 }
