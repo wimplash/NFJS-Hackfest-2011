@@ -19,6 +19,6 @@
 
 	<servlet-mapping>
 		<servlet-name>jersey-service</servlet-name>
-		<url-pattern>/ws/*</url-pattern>
+		<url-pattern>/resources/*</url-pattern>
 	</servlet-mapping>
 </web-app>
