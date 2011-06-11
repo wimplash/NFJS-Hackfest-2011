@@ -1,6 +1,6 @@
 task hello << {
   println 'Hello, world!'
 }
-task date(dependsOn: hello) << {
+task date(dependsOn: hello) {
   println new Date()
 }
