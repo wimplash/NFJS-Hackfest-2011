@@ -1,9 +1,11 @@
 package com.blogspot.activeactive.chitchat.resources;
 
+import static javax.ws.rs.core.MediaType.APPLICATION_XML;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 
+import org.apache.http.HttpResponse;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Test;
@@ -110,5 +112,48 @@ public class ITUserResource {
 		assertEquals("Ralph", u.getJSONObject("name").get("first"));
 		assertEquals("Mouse", u.getJSONObject("name").get("last"));
 		assertEquals("ralphie", u.get("nick"));
+	}
+
+	@Test
+	public void deleteByNickShouldRemoveUser() throws Exception {
+		helper.postJsonPayloadAndGetJsonPayload("/user",
+				"{\"name\":{\"first\":\"Delete\",\"last\":\"Me\"},\"nick\":\"delete_me\"}");
+		helper.deleteResponse("/user/nick/delete_me");
+		final HttpResponse rsp = helper.getResponse("/user/nick/delete_me", APPLICATION_XML);
+		assertEquals(404, rsp.getStatusLine().getStatusCode());
+	}
+
+	@Test
+	public void deleteByInvalidNickShouldFailWith404() throws Exception {
+		final HttpResponse rsp = helper.deleteResponse("/user/nick/delete_me");
+		assertEquals(404, rsp.getStatusLine().getStatusCode());
+	}
+
+	@Test
+	public void getByInvalidNickShouldFailWith404() throws Exception {
+		final HttpResponse rsp = helper.getResponse("/user/nick/invalid", APPLICATION_XML);
+		assertEquals(404, rsp.getStatusLine().getStatusCode());
+	}
+
+	@Test
+	public void deleteByIdShouldRemoveUser() throws Exception {
+		final JSONObject u = helper.postJsonPayloadAndGetJsonPayload("/user",
+				"{\"name\":{\"first\":\"Delete\",\"last\":\"Me\"},\"nick\":\"delete_me\"}");
+		final Integer id = u.getInt("id");
+		helper.deleteResponse("/user/id/" + id);
+		final HttpResponse rsp = helper.getResponse("/user/id/" + id, APPLICATION_XML);
+		assertEquals(404, rsp.getStatusLine().getStatusCode());
+	}
+
+	@Test
+	public void deleteByInvalidIdShouldFailWith404() throws Exception {
+		final HttpResponse rsp = helper.deleteResponse("/user/id/99");
+		assertEquals(404, rsp.getStatusLine().getStatusCode());
+	}
+
+	@Test
+	public void getByInvalidIdShouldFailWith404() throws Exception {
+		final HttpResponse rsp = helper.getResponse("/user/id/99", APPLICATION_XML);
+		assertEquals(404, rsp.getStatusLine().getStatusCode());
 	}
 }

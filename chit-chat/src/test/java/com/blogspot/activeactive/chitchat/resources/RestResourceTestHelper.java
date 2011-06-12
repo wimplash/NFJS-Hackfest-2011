@@ -20,6 +20,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -32,17 +33,12 @@ import org.json.JSONTokener;
 
 public class RestResourceTestHelper {
 
-	private HttpClient client;
-
 	public String getBaseUrl() {
 		return "http://localhost:8080/resources";
 	}
 
 	public HttpClient getClient() {
-		if (client == null) {
-			client = new DefaultHttpClient(new ThreadSafeClientConnManager());
-		}
-		return client;
+		return new DefaultHttpClient(new ThreadSafeClientConnManager());
 	}
 
 	public InputStream getContentStream(final HttpResponse response)
@@ -107,8 +103,7 @@ public class RestResourceTestHelper {
 	}
 
 	public <T> T unMarshall(final InputStream contentStream,
-			final Class<T> expectedClass)
-			throws javax.xml.stream.FactoryConfigurationError,
+			final Class<T> expectedClass) throws FactoryConfigurationError,
 			XMLStreamException, JAXBException {
 		final XMLInputFactory f = XMLInputFactory.newFactory();
 		final XMLStreamReader reader = f.createXMLStreamReader(contentStream);
@@ -116,5 +111,11 @@ public class RestResourceTestHelper {
 		final Unmarshaller um = ctx.createUnmarshaller();
 		final JAXBElement<T> el = um.unmarshal(reader, expectedClass);
 		return el.getValue();
+	}
+
+	public HttpResponse deleteResponse(final String path)
+			throws ClientProtocolException, IOException {
+		final HttpDelete delete = new HttpDelete(getBaseUrl() + path);
+		return getClient().execute(delete);
 	}
 }

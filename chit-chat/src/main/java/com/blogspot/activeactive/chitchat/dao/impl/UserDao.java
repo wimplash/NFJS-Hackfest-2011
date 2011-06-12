@@ -29,6 +29,11 @@ public class UserDao {
 	}
 
 	private static User createUser(final int id, final String firstName,
+			final String lastName) {
+		return createUser(id, firstName, lastName, null);
+	}
+
+	private static User createUser(final int id, final String firstName,
 			final String lastName, final String nick) {
 		final User u = new User();
 		u.setId(new Integer(id));
@@ -37,9 +42,22 @@ public class UserDao {
 		return u;
 	}
 
-	private static User createUser(final int id, final String firstName,
-			final String lastName) {
-		return createUser(id, firstName, lastName, null);
+	public User create(final User user) {
+		final List<Integer> keys = new ArrayList<Integer>(users.keySet());
+		Collections.sort(keys, new Comparator<Integer>() {
+			@Override
+			public int compare(Integer o1, Integer o2) {
+				return -(o1.compareTo(o2));
+			}
+		});
+		final Integer id = keys.get(0) + 1;
+		user.setId(id);
+		users.put(id, user);
+		return user;
+	}
+
+	public User deleteById(final Integer id) {
+		return users.remove(id);
 	}
 
 	public List<User> getAll() {
@@ -57,19 +75,5 @@ public class UserDao {
 			}
 		}
 		return null;
-	}
-
-	public User create(final User user) {
-		final List<Integer> keys = new ArrayList<Integer>(users.keySet());
-		Collections.sort(keys, new Comparator<Integer>() {
-			@Override
-			public int compare(Integer o1, Integer o2) {
-				return -(o1.compareTo(o2));
-			}
-		});
-		final Integer id = keys.get(0) + 1;
-		user.setId(id);
-		users.put(id, user);
-		return user;
 	}
 }
