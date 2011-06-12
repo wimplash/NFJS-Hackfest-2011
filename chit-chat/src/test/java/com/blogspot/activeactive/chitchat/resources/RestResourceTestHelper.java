@@ -16,10 +16,13 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -70,6 +73,35 @@ public class RestResourceTestHelper {
 		final Unmarshaller um = ctx.createUnmarshaller();
 		final JAXBElement<T> el = um.unmarshal(reader, expectedClass);
 		return el.getValue();
+	}
+
+	public <T> T postXmlPayloadAndGetXmlPayload(final String path,
+			final String payload, final Class<T> expectedClass)
+			throws ClientProtocolException, IOException, XMLStreamException,
+			JAXBException {
+		final HttpPost post = new HttpPost(getBaseUrl() + path);
+		post.addHeader("Accept", APPLICATION_XML);
+		post.setEntity(new StringEntity(payload, APPLICATION_XML, "UTF-8"));
+		final HttpResponse rsp = getClient().execute(post);
+		final InputStream is = rsp.getEntity().getContent();
+		final XMLInputFactory f = XMLInputFactory.newFactory();
+		final XMLStreamReader reader = f.createXMLStreamReader(is);
+		final JAXBContext ctx = JAXBContext.newInstance(expectedClass);
+		final Unmarshaller um = ctx.createUnmarshaller();
+		final JAXBElement<T> el = um.unmarshal(reader, expectedClass);
+		return el.getValue();
+	}
+
+	public JSONObject postJsonPayloadAndGetJsonPayload(final String path,
+			final String payload) throws ClientProtocolException, IOException,
+			JSONException {
+		final HttpPost post = new HttpPost(getBaseUrl() + path);
+		post.addHeader("Accept", APPLICATION_JSON);
+		post.setEntity(new StringEntity(payload, APPLICATION_JSON, "UTF-8"));
+		final HttpResponse rsp = getClient().execute(post);
+		final InputStream is = rsp.getEntity().getContent();
+		final String content = IOUtils.toString(is);
+		return new JSONObject(new JSONTokener(content));
 	}
 
 	public HttpResponse getResponse(final String path,

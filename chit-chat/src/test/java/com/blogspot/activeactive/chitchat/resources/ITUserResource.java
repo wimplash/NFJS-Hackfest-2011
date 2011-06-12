@@ -1,8 +1,8 @@
 package com.blogspot.activeactive.chitchat.resources;
 
+import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
-import junit.framework.Assert;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -62,5 +62,53 @@ public class ITUserResource {
 		final JSONObject u = helper.getPayloadFromJson("/user/id/1");
 		assertTrue(u.has("url"));
 		assertEquals(helper.getBaseUrl() + "/user/id/1", u.get("url"));
+	}
+
+	@Test
+	public void postShouldAcceptXmlUser() throws Exception {
+		final User u = helper.postXmlPayloadAndGetXmlPayload("/user",
+				"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
+						+ "<user>"
+						+ "<name><first>Joe</first><last>O'Brien</last></name>"
+						+ "<nick>objo</nick>" + "</user>", User.class);
+		assertNotNull(u.getId());
+		assertEquals("Joe", u.getName().getFirst());
+		assertEquals("O'Brien", u.getName().getLast());
+		assertEquals("objo", u.getNick());
+	}
+
+	@Test
+	public void postShouldStoreXmlUser() throws Exception {
+		helper.postXmlPayloadAndGetXmlPayload("/user",
+				"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
+				+ "<user>"
+				+ "<name><first>Christopher</first><last>Judd</last></name>"
+				+ "<nick>javajudd</nick>" + "</user>", User.class);
+		final User u = helper.getPayloadFromXml("/user/nick/javajudd", User.class);
+		assertNotNull(u.getId());
+		assertEquals("Christopher", u.getName().getFirst());
+		assertEquals("Judd", u.getName().getLast());
+		assertEquals("javajudd", u.getNick());
+	}
+
+	@Test
+	public void postShouldAcceptJsonUser() throws Exception {
+		final JSONObject u = helper.postJsonPayloadAndGetJsonPayload("/user",
+				"{\"name\":{\"first\":\"Mattimeo\",\"last\":\"Mouse\"},\"nick\":\"mattimeo\"}");
+		assertTrue(u.has("id"));
+		assertEquals("Mattimeo", u.getJSONObject("name").get("first"));
+		assertEquals("Mouse", u.getJSONObject("name").get("last"));
+		assertEquals("mattimeo", u.get("nick"));
+	}
+	
+	@Test
+	public void postShouldStoreJsonUser() throws Exception {
+		helper.postJsonPayloadAndGetJsonPayload("/user",
+				"{\"name\":{\"first\":\"Ralph\",\"last\":\"Mouse\"},\"nick\":\"ralphie\"}");
+		final JSONObject u = helper.getPayloadFromJson("/user/nick/ralphie");
+		assertTrue(u.has("id"));
+		assertEquals("Ralph", u.getJSONObject("name").get("first"));
+		assertEquals("Mouse", u.getJSONObject("name").get("last"));
+		assertEquals("ralphie", u.get("nick"));
 	}
 }
