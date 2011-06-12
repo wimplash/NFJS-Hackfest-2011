@@ -69,6 +69,11 @@
 			<version>2.0.1</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.sun.jersey</groupId>
+			<artifactId>jersey-server-linking</artifactId>
+			<version>${jersey-version}</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>

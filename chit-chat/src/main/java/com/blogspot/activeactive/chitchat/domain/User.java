@@ -1,8 +1,12 @@
 package com.blogspot.activeactive.chitchat.domain;
 
+import static com.sun.jersey.server.linking.Ref.Style.ABSOLUTE;
+
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+
+import com.sun.jersey.server.linking.Ref;
 
 @XmlRootElement
 @XmlType
@@ -13,6 +17,9 @@ public class User {
 	private Name name;
 
 	private String nick;
+
+	@Ref(value = "user/id/{id}", style = ABSOLUTE)
+	private String url;
 
 	@XmlAttribute(required = true)
 	public Integer getId() {
@@ -27,6 +34,10 @@ public class User {
 		return nick;
 	}
 
+	public String getUrl() {
+		return url;
+	}
+
 	public void setId(final Integer id) {
 		this.id = id;
 	}
@@ -37,6 +48,10 @@ public class User {
 
 	public void setNick(final String nick) {
 		this.nick = nick;
+	}
+
+	public void setUrl(final String url) {
+		this.url = url;
 	}
 
 	@Override
