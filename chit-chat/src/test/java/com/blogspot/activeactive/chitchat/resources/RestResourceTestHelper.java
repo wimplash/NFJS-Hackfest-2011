@@ -23,6 +23,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
@@ -117,5 +118,28 @@ public class RestResourceTestHelper {
 			throws ClientProtocolException, IOException {
 		final HttpDelete delete = new HttpDelete(getBaseUrl() + path);
 		return getClient().execute(delete);
+	}
+
+	public HttpResponse putResponse(final String path, final String mediaType)
+			throws ClientProtocolException, IOException {
+		final HttpPut put = new HttpPut(getBaseUrl() + path);
+		put.addHeader("Accept", mediaType);
+		return getClient().execute(put);
+	}
+
+	public JSONObject putAndGetJsonResponse(final String path)
+			throws ClientProtocolException, IOException, JSONException {
+		final HttpResponse rsp = putResponse(path, APPLICATION_JSON);
+		final InputStream content = getContentStream(rsp);
+		return new JSONObject(new JSONTokener(new InputStreamReader(content)));
+	}
+
+	public <T> T putAndGetXmlResponse(final String path,
+			final Class<T> expectedClass) throws ClientProtocolException,
+			IOException, FactoryConfigurationError, XMLStreamException,
+			JAXBException {
+		final HttpResponse rsp = putResponse(path, APPLICATION_XML);
+		final InputStream content = getContentStream(rsp);
+		return unMarshall(content, expectedClass);
 	}
 }

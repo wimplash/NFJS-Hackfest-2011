@@ -3,8 +3,6 @@ package com.blogspot.activeactive.chitchat.dao.impl;
 import static java.util.Collections.synchronizedMap;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,17 +40,12 @@ public class UserDao {
 		return u;
 	}
 
-	public User create(final User user) {
-		final List<Integer> keys = new ArrayList<Integer>(users.keySet());
-		Collections.sort(keys, new Comparator<Integer>() {
-			@Override
-			public int compare(Integer o1, Integer o2) {
-				return -(o1.compareTo(o2));
-			}
-		});
-		final Integer id = keys.get(0) + 1;
+	public User create(final Integer id) {
+		if (users.containsKey(id)) {
+			return null;
+		}
+		final User user = new User();
 		user.setId(id);
-		users.put(id, user);
 		return user;
 	}
 

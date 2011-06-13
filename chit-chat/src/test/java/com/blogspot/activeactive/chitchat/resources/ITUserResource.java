@@ -2,6 +2,7 @@ package com.blogspot.activeactive.chitchat.resources;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_XML;
 import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertNull;
 import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 
@@ -67,66 +68,32 @@ public class ITUserResource {
 	}
 
 	@Test
-	public void postShouldAcceptXmlUser() throws Exception {
-		final User u = helper.postXmlPayloadAndGetXmlPayload("/user",
-				"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
-						+ "<user>"
-						+ "<name><first>Joe</first><last>O'Brien</last></name>"
-						+ "<nick>objo</nick>" + "</user>", User.class);
-		assertNotNull(u.getId());
-		assertEquals("Joe", u.getName().getFirst());
-		assertEquals("O'Brien", u.getName().getLast());
-		assertEquals("objo", u.getNick());
+	public void putShouldStoreEmptyUser() throws Exception {
+		helper.putAndGetJsonResponse("/user/id/97");
+		final User u = helper.getPayloadFromXml("/user/id/97", User.class);
+		assertNotNull(u);
 	}
 
 	@Test
-	public void postShouldStoreXmlUser() throws Exception {
-		helper.postXmlPayloadAndGetXmlPayload("/user",
-				"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
-				+ "<user>"
-				+ "<name><first>Christopher</first><last>Judd</last></name>"
-				+ "<nick>javajudd</nick>" + "</user>", User.class);
-		final User u = helper.getPayloadFromXml("/user/nick/javajudd", User.class);
-		assertNotNull(u.getId());
-		assertEquals("Christopher", u.getName().getFirst());
-		assertEquals("Judd", u.getName().getLast());
-		assertEquals("javajudd", u.getNick());
-	}
-
-	@Test
-	public void postShouldAcceptJsonUser() throws Exception {
-		final JSONObject u = helper.postJsonPayloadAndGetJsonPayload("/user",
-				"{\"name\":{\"first\":\"Mattimeo\",\"last\":\"Mouse\"},\"nick\":\"mattimeo\"}");
-		assertTrue(u.has("id"));
-		assertEquals("Mattimeo", u.getJSONObject("name").get("first"));
-		assertEquals("Mouse", u.getJSONObject("name").get("last"));
-		assertEquals("mattimeo", u.get("nick"));
+	public void putShouldCreateAndReturnAnEmptyXmlUser() throws Exception {
+		final User u = helper.putAndGetXmlResponse("/user/id/98", User.class);
+		assertEquals(new Integer(98), u.getId());
+		assertNull(u.getName());
+		assertNull(u.getNick());
 	}
 	
 	@Test
-	public void postShouldStoreJsonUser() throws Exception {
-		helper.postJsonPayloadAndGetJsonPayload("/user",
-				"{\"name\":{\"first\":\"Ralph\",\"last\":\"Mouse\"},\"nick\":\"ralphie\"}");
-		final JSONObject u = helper.getPayloadFromJson("/user/nick/ralphie");
-		assertTrue(u.has("id"));
-		assertEquals("Ralph", u.getJSONObject("name").get("first"));
-		assertEquals("Mouse", u.getJSONObject("name").get("last"));
-		assertEquals("ralphie", u.get("nick"));
+	public void putShouldCreateAndReturnAnEmptyJsonUser() throws Exception {
+		final JSONObject u = helper.putAndGetJsonResponse("/user/id/99");
+		assertEquals(99, u.getInt("id"));
+		assertTrue(u.isNull("name"));
+		assertTrue(u.isNull("nick"));
 	}
 
 	@Test
-	public void deleteByNickShouldRemoveUser() throws Exception {
-		helper.postJsonPayloadAndGetJsonPayload("/user",
-				"{\"name\":{\"first\":\"Delete\",\"last\":\"Me\"},\"nick\":\"delete_me\"}");
-		helper.deleteResponse("/user/nick/delete_me");
-		final HttpResponse rsp = helper.getResponse("/user/nick/delete_me", APPLICATION_XML);
-		assertEquals(404, rsp.getStatusLine().getStatusCode());
-	}
-
-	@Test
-	public void deleteByInvalidNickShouldFailWith404() throws Exception {
-		final HttpResponse rsp = helper.deleteResponse("/user/nick/delete_me");
-		assertEquals(404, rsp.getStatusLine().getStatusCode());
+	public void putShouldFailWith409WhenIdAlreadyExists() throws Exception {
+		final HttpResponse rsp = helper.putResponse("/user/id/1", APPLICATION_XML);
+		assertEquals(409, rsp.getStatusLine().getStatusCode());
 	}
 
 	@Test
@@ -137,23 +104,21 @@ public class ITUserResource {
 
 	@Test
 	public void deleteByIdShouldRemoveUser() throws Exception {
-		final JSONObject u = helper.postJsonPayloadAndGetJsonPayload("/user",
-				"{\"name\":{\"first\":\"Delete\",\"last\":\"Me\"},\"nick\":\"delete_me\"}");
-		final Integer id = u.getInt("id");
-		helper.deleteResponse("/user/id/" + id);
-		final HttpResponse rsp = helper.getResponse("/user/id/" + id, APPLICATION_XML);
+		helper.putAndGetJsonResponse("/user/id/999");
+		helper.deleteResponse("/user/id/999");
+		final HttpResponse rsp = helper.getResponse("/user/id/999", APPLICATION_XML);
 		assertEquals(404, rsp.getStatusLine().getStatusCode());
 	}
 
 	@Test
 	public void deleteByInvalidIdShouldFailWith404() throws Exception {
-		final HttpResponse rsp = helper.deleteResponse("/user/id/99");
+		final HttpResponse rsp = helper.deleteResponse("/user/id/999");
 		assertEquals(404, rsp.getStatusLine().getStatusCode());
 	}
 
 	@Test
 	public void getByInvalidIdShouldFailWith404() throws Exception {
-		final HttpResponse rsp = helper.getResponse("/user/id/99", APPLICATION_XML);
+		final HttpResponse rsp = helper.getResponse("/user/id/999", APPLICATION_XML);
 		assertEquals(404, rsp.getStatusLine().getStatusCode());
 	}
 }
