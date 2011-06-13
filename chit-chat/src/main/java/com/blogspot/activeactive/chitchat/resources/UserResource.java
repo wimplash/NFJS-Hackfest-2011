@@ -22,17 +22,6 @@ public class UserResource {
 
 	private static final UserDao userDao = new UserDao();
 
-	@PUT
-	@Path("/id/{id}")
-	@Produces({APPLICATION_XML, APPLICATION_JSON})
-	public User addUser(@PathParam("id") final Integer id) {
-		final User user = userDao.create(id);
-		if (user == null) {
-			throw new ConflictException();
-		}
-		return user;
-	}
-
 	@DELETE
 	@Path("/id/{id}")
 	@Produces({APPLICATION_XML, APPLICATION_JSON})
@@ -65,6 +54,17 @@ public class UserResource {
 		final User user = userDao.getByNick(nick);
 		if (user == null) {
 			throw new NotFoundException();
+		}
+		return user;
+	}
+
+	@PUT
+	@Path("/id/{id}")
+	@Produces({APPLICATION_XML, APPLICATION_JSON})
+	public User putNewUserById(@PathParam("id") final Integer id) {
+		final User user = userDao.create(id);
+		if (user == null) {
+			throw new ConflictException();
 		}
 		return user;
 	}

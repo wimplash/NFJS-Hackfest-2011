@@ -34,6 +34,35 @@ import org.json.JSONTokener;
 
 public class RestResourceTestHelper {
 
+	public HttpResponse doDelete(final String path)
+			throws ClientProtocolException, IOException {
+		final HttpDelete delete = new HttpDelete(getBaseUrl() + path);
+		return getClient().execute(delete);
+	}
+
+	public HttpResponse doGet(final String path, final String mediaType)
+			throws IOException, ClientProtocolException {
+		final HttpGet get = new HttpGet(getBaseUrl() + path);
+		get.addHeader("Accept", mediaType);
+		return getClient().execute(get);
+	}
+
+	public HttpResponse doPost(final String path, final String payload,
+			String mediaType) throws UnsupportedEncodingException, IOException,
+			ClientProtocolException {
+		final HttpPost post = new HttpPost(getBaseUrl() + path);
+		post.addHeader("Accept", mediaType);
+		post.setEntity(new StringEntity(payload, mediaType, "UTF-8"));
+		return getClient().execute(post);
+	}
+
+	public HttpResponse doPut(final String path, final String mediaType)
+			throws ClientProtocolException, IOException {
+		final HttpPut put = new HttpPut(getBaseUrl() + path);
+		put.addHeader("Accept", mediaType);
+		return getClient().execute(put);
+	}
+
 	public String getBaseUrl() {
 		return "http://localhost:8080/resources";
 	}
@@ -47,58 +76,58 @@ public class RestResourceTestHelper {
 		return response.getEntity().getContent();
 	}
 
-	public JSONArray getPayloadArrayFromJson(final String path)
+	public JSONArray getJsonArrayResponse(final String path)
 			throws ClientProtocolException, IOException, JSONException {
-		final HttpResponse rsp = getResponse(path, APPLICATION_JSON);
+		final HttpResponse rsp = doGet(path, APPLICATION_JSON);
 		final InputStream content = getContentStream(rsp);
 		return new JSONArray(new JSONTokener(new InputStreamReader(content)));
 	}
 
-	public JSONObject getPayloadFromJson(final String path)
+	public JSONObject getJsonResponse(final String path)
 			throws ClientProtocolException, IOException, JSONException {
-		final HttpResponse rsp = getResponse(path, APPLICATION_JSON);
+		final HttpResponse rsp = doGet(path, APPLICATION_JSON);
 		final InputStream content = getContentStream(rsp);
 		return new JSONObject(new JSONTokener(new InputStreamReader(content)));
 	}
 
-	public <T> T getPayloadFromXml(final String path,
+	public <T> T getXmlResponse(final String path,
 			final Class<T> expectedClass) throws JAXBException, IOException,
 			ClientProtocolException, FactoryConfigurationError,
 			XMLStreamException {
-		final HttpResponse rsp = getResponse(path, APPLICATION_XML);
+		final HttpResponse rsp = doGet(path, APPLICATION_XML);
 		final InputStream content = getContentStream(rsp);
 		return unMarshall(content, expectedClass);
 	}
 
-	public HttpResponse getResponse(final String path, final String mediaType)
-			throws IOException, ClientProtocolException {
-		final HttpGet get = new HttpGet(getBaseUrl() + path);
-		get.addHeader("Accept", mediaType);
-		return getClient().execute(get);
-	}
-
-	public JSONObject postJsonPayloadAndGetJsonPayload(final String path,
+	public JSONObject postJsonRequestAndGetJsonResponse(final String path,
 			final String payload) throws ClientProtocolException, IOException,
 			JSONException {
-		final HttpResponse rsp = postResponse(path, payload, APPLICATION_JSON);
+		final HttpResponse rsp = doPost(path, payload, APPLICATION_JSON);
 		final InputStream content = getContentStream(rsp);
 		return new JSONObject(new JSONTokener(new InputStreamReader(content)));
 	}
 
-	public HttpResponse postResponse(final String path, final String payload,
-			String mediaType) throws UnsupportedEncodingException, IOException,
-			ClientProtocolException {
-		final HttpPost post = new HttpPost(getBaseUrl() + path);
-		post.addHeader("Accept", mediaType);
-		post.setEntity(new StringEntity(payload, mediaType, "UTF-8"));
-		return getClient().execute(post);
-	}
-
-	public <T> T postXmlPayloadAndGetXmlPayload(final String path,
+	public <T> T postXmlRequestAndGetXmlResponse(final String path,
 			final String payload, final Class<T> expectedClass)
 			throws ClientProtocolException, IOException, XMLStreamException,
 			JAXBException {
-		final HttpResponse rsp = postResponse(path, payload, APPLICATION_XML);
+		final HttpResponse rsp = doPost(path, payload, APPLICATION_XML);
+		final InputStream content = getContentStream(rsp);
+		return unMarshall(content, expectedClass);
+	}
+
+	public JSONObject putAndGetJsonResponse(final String path)
+			throws ClientProtocolException, IOException, JSONException {
+		final HttpResponse rsp = doPut(path, APPLICATION_JSON);
+		final InputStream content = getContentStream(rsp);
+		return new JSONObject(new JSONTokener(new InputStreamReader(content)));
+	}
+
+	public <T> T putAndGetXmlResponse(final String path,
+			final Class<T> expectedClass) throws ClientProtocolException,
+			IOException, FactoryConfigurationError, XMLStreamException,
+			JAXBException {
+		final HttpResponse rsp = doPut(path, APPLICATION_XML);
 		final InputStream content = getContentStream(rsp);
 		return unMarshall(content, expectedClass);
 	}
@@ -112,34 +141,5 @@ public class RestResourceTestHelper {
 		final Unmarshaller um = ctx.createUnmarshaller();
 		final JAXBElement<T> el = um.unmarshal(reader, expectedClass);
 		return el.getValue();
-	}
-
-	public HttpResponse deleteResponse(final String path)
-			throws ClientProtocolException, IOException {
-		final HttpDelete delete = new HttpDelete(getBaseUrl() + path);
-		return getClient().execute(delete);
-	}
-
-	public HttpResponse putResponse(final String path, final String mediaType)
-			throws ClientProtocolException, IOException {
-		final HttpPut put = new HttpPut(getBaseUrl() + path);
-		put.addHeader("Accept", mediaType);
-		return getClient().execute(put);
-	}
-
-	public JSONObject putAndGetJsonResponse(final String path)
-			throws ClientProtocolException, IOException, JSONException {
-		final HttpResponse rsp = putResponse(path, APPLICATION_JSON);
-		final InputStream content = getContentStream(rsp);
-		return new JSONObject(new JSONTokener(new InputStreamReader(content)));
-	}
-
-	public <T> T putAndGetXmlResponse(final String path,
-			final Class<T> expectedClass) throws ClientProtocolException,
-			IOException, FactoryConfigurationError, XMLStreamException,
-			JAXBException {
-		final HttpResponse rsp = putResponse(path, APPLICATION_XML);
-		final InputStream content = getContentStream(rsp);
-		return unMarshall(content, expectedClass);
 	}
 }

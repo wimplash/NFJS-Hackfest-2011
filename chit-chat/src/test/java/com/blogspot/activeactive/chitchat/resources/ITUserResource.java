@@ -20,49 +20,49 @@ public class ITUserResource {
 
 	@Test
 	public void userResourceShouldReturnJsonListForBaseUserUrl() throws Exception {
-		final JSONArray array = helper.getPayloadArrayFromJson("/user");
+		final JSONArray array = helper.getJsonArrayResponse("/user");
 		assertEquals(2, array.length());
 	}
 
 	@Test
 	public void userResourceShouldReturnJsonUserForUserUrlWithId() throws Exception {
-		final JSONObject user = helper.getPayloadFromJson("/user/id/1");
+		final JSONObject user = helper.getJsonResponse("/user/id/1");
 		assertEquals(1, user.getInt("id"));
 	}
 
 	@Test
 	public void userResourceShouldReturnJsonUserForUserUrlWithNick() throws Exception {
-		final JSONObject user = helper.getPayloadFromJson("/user/nick/wimplash");
+		final JSONObject user = helper.getJsonResponse("/user/nick/wimplash");
 		assertEquals(1, user.getInt("id"));
 	}
 
 	@Test
 	public void userResourceShouldReturnXmlListForBaseUserUrl() throws Exception {
-		final Users u = helper.getPayloadFromXml("/user", Users.class);
+		final Users u = helper.getXmlResponse("/user", Users.class);
 		assertEquals(2, u.getUser().size());
 	}
 
 	@Test
 	public void userResourceShouldReturnXmlUserForUserUrlWithId() throws Exception {
-		final User u = helper.getPayloadFromXml("/user/id/1", User.class);
+		final User u = helper.getXmlResponse("/user/id/1", User.class);
 		assertEquals(new Integer(1), u.getId());
 	}
 
 	@Test
 	public void userResourceShouldReturnXmlUserForUserUrlWithNick() throws Exception {
-		final User u = helper.getPayloadFromXml("/user/nick/wimplash", User.class);
+		final User u = helper.getXmlResponse("/user/nick/wimplash", User.class);
 		assertEquals(new Integer(1), u.getId());
 	}
 
 	@Test
 	public void xmlUserInstanceShouldContainUrlAttribute() throws Exception {
-		final User u = helper.getPayloadFromXml("/user/id/1", User.class);
+		final User u = helper.getXmlResponse("/user/id/1", User.class);
 		assertEquals(helper.getBaseUrl() + "/user/id/1", u.getUrl());
 	}
 
 	@Test
 	public void jsonUserInstanceShouldContainUrlAttribute() throws Exception {
-		final JSONObject u = helper.getPayloadFromJson("/user/id/1");
+		final JSONObject u = helper.getJsonResponse("/user/id/1");
 		assertTrue(u.has("url"));
 		assertEquals(helper.getBaseUrl() + "/user/id/1", u.get("url"));
 	}
@@ -70,7 +70,7 @@ public class ITUserResource {
 	@Test
 	public void putShouldStoreEmptyUser() throws Exception {
 		helper.putAndGetJsonResponse("/user/id/97");
-		final User u = helper.getPayloadFromXml("/user/id/97", User.class);
+		final User u = helper.getXmlResponse("/user/id/97", User.class);
 		assertNotNull(u);
 	}
 
@@ -92,33 +92,33 @@ public class ITUserResource {
 
 	@Test
 	public void putShouldFailWith409WhenIdAlreadyExists() throws Exception {
-		final HttpResponse rsp = helper.putResponse("/user/id/1", APPLICATION_XML);
+		final HttpResponse rsp = helper.doPut("/user/id/1", APPLICATION_XML);
 		assertEquals(409, rsp.getStatusLine().getStatusCode());
 	}
 
 	@Test
 	public void getByInvalidNickShouldFailWith404() throws Exception {
-		final HttpResponse rsp = helper.getResponse("/user/nick/invalid", APPLICATION_XML);
+		final HttpResponse rsp = helper.doGet("/user/nick/invalid", APPLICATION_XML);
 		assertEquals(404, rsp.getStatusLine().getStatusCode());
 	}
 
 	@Test
 	public void deleteByIdShouldRemoveUser() throws Exception {
 		helper.putAndGetJsonResponse("/user/id/999");
-		helper.deleteResponse("/user/id/999");
-		final HttpResponse rsp = helper.getResponse("/user/id/999", APPLICATION_XML);
+		helper.doDelete("/user/id/999");
+		final HttpResponse rsp = helper.doGet("/user/id/999", APPLICATION_XML);
 		assertEquals(404, rsp.getStatusLine().getStatusCode());
 	}
 
 	@Test
 	public void deleteByInvalidIdShouldFailWith404() throws Exception {
-		final HttpResponse rsp = helper.deleteResponse("/user/id/999");
+		final HttpResponse rsp = helper.doDelete("/user/id/999");
 		assertEquals(404, rsp.getStatusLine().getStatusCode());
 	}
 
 	@Test
 	public void getByInvalidIdShouldFailWith404() throws Exception {
-		final HttpResponse rsp = helper.getResponse("/user/id/999", APPLICATION_XML);
+		final HttpResponse rsp = helper.doGet("/user/id/999", APPLICATION_XML);
 		assertEquals(404, rsp.getStatusLine().getStatusCode());
 	}
 }
